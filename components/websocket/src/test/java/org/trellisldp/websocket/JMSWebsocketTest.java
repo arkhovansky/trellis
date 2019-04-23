@@ -34,6 +34,7 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,6 @@ public class JMSWebsocketTest implements MessageListener {
     private static final String QUEUE = "testQueue";
     private static final List<String> MESSAGES = new ArrayList<>();
 
-    private MessageConsumer consumer;
     private Connection connection;
 
     @BeforeAll
@@ -69,8 +69,13 @@ public class JMSWebsocketTest implements MessageListener {
         connection.start();
         final Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         final Destination destination = session.createQueue(QUEUE);
-        consumer = session.createConsumer(destination);
+        final MessageConsumer consumer = session.createConsumer(destination);
         consumer.setMessageListener(this);
+    }
+
+    @AfterEach
+    public void closeConnection() throws Exception {
+        connection.close();
     }
 
     @Override
@@ -85,7 +90,7 @@ public class JMSWebsocketTest implements MessageListener {
     }
 
     private void observes(final @Observes String update) {
-        LOGGER.info("Observing event");
+        LOGGER.info("Observing event: {}", update);
     }
 
     @Test

@@ -25,6 +25,7 @@ import javax.websocket.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.trellisldp.api.RuntimeTrellisException;
 
 public class TrellisWebsocketTest {
 
@@ -127,13 +128,13 @@ public class TrellisWebsocketTest {
     @Test
     public void testErrorHandler() {
         final TrellisWebSocket socket = new TrellisWebSocket();
-        assertDoesNotThrow(() -> socket.error(mockSession, new RuntimeException("Expected Exception")));
+        assertDoesNotThrow(() -> socket.error(mockSession, new RuntimeTrellisException("Expected Exception")));
     }
 
     @Test
     public void testFailedAsync() {
         when(mockEndpoint.sendText(anyString())).thenAnswer(inv -> runAsync(() -> {
-            throw new RuntimeException("Expected async exception");
+            throw new RuntimeTrellisException("Expected async exception");
         }));
         final TrellisWebSocket socket = new TrellisWebSocket();
         socket.open(mockSession);
